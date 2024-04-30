@@ -24,3 +24,22 @@ export async function getCustomerById(id) {
     return row;
 }
 
+export async function searchCustomers(searchTerm) {
+    const searchPattern = `%${searchTerm}%`;  // Used for partial matching on name
+    const query = `
+        SELECT * FROM Customer
+        WHERE CONCAT(first_name, ' ', IFNULL(middle_name, ''), ' ', IFNULL(last_name, '')) LIKE ?
+        OR mobile = ?
+        OR office_phone = ?
+        OR residential_phone = ?;
+    `;
+    try {
+        const [rows] = await pool.query(query, [searchPattern, searchTerm, searchTerm, searchTerm]);
+        return rows;
+    } catch (error) {
+        console.error('Database query failed:', error);
+        throw error;  // Rethrow the error to be caught by the caller
+    }
+}
+
+
