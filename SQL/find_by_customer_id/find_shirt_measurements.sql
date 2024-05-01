@@ -1,6 +1,7 @@
 SELECT 
     `measurement_id`,
     `date`,
+    `orderNo`,
     `length`,
     `half_shoulder`,
     `to_sleeve`,
