@@ -17,3 +17,9 @@ export async function getShirtMeasurementByCustomerId(id) {
     const rows = result[0];
     return rows;
 }
+
+export async function getShirtMeasurementByOrderNo(orderNo) {
+    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`length`,`half_shoulder`,`to_sleeve`,`chest`,`waist`,`collar`,`waist_coat_length`,`sherwani_length`,`other_notes` FROM `ShirtMeasurement` WHERE `orderNo` = ?", [orderNo]);
+    const rows = result[0];
+    return rows;
+}

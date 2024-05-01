@@ -13,7 +13,13 @@ const pool = mysql.createPool({
 }).promise();
 
 export async function getPantMeasurementByCustomerId(id) {
-    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`length`,`half_shoulder`,`to_sleeve`,`chest`,`waist`,`collar`,`waist_coat_length`,`sherwani_length`,`other_notes` FROM `ShirtMeasurement` WHERE `customer_id` = ?", [id])
+    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`length`,`inseem`,`waist`,`hips`,`bottom`,`knee`,`other_notes` FROM `PantMeasurement` WHERE `customer_id` = ?;", [id])
+    const rows = result[0];
+    return rows;
+}
+
+export async function getPantMeasurementByOrderNo(orderNo) {
+    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`length`,`inseem`,`waist`,`hips`,`bottom`,`knee`,`other_notes` FROM `PantMeasurement` WHERE `orderNo` = ?", [orderNo]);
     const rows = result[0];
     return rows;
 }

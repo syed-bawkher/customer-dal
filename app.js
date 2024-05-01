@@ -1,9 +1,9 @@
 import express from 'express';
 import { getCustomerById, getCustomers, searchCustomers } from './services/customerService.js';
 import { getOrders, getOrderById, getOrdersByCustomerId } from './services/orderService.js';
-import { getJacketMeasurementByCustomerId } from './services/jacketMeasurementService.js';
-import { getShirtMeasurementByCustomerId } from './services/shirtMeasurementService.js';
-import { getPantMeasurementByCustomerId } from './services/pantMeasurementService.js';
+import { getJacketMeasurementByCustomerId, getJacketMeasurementByOrderNo } from './services/jacketMeasurementService.js';
+import { getShirtMeasurementByCustomerId, getShirtMeasurementByOrderNo } from './services/shirtMeasurementService.js';
+import { getPantMeasurementByCustomerId, getPantMeasurementByOrderNo } from './services/pantMeasurementService.js';
 
 const app = express();
 app.use(express.json()); // to parse JSON bodies
@@ -60,18 +60,36 @@ app.get("/jacketMeasurement/customer/:id", async (req, res) => {
     res.send(jacketMeasurement);
 })
 
+app.get("/jacketMeasurement/order/:orderNo", async (req, res) => {
+    const orderNo = req.params.orderNo;
+    const jacketMeasurement = await getJacketMeasurementByOrderNo(orderNo);
+    res.send(jacketMeasurement);
+})
+
 //SHIRT MEASUREMENT ROUTES
 app.get("/shirtMeasurement/customer/:id", async (req, res) => {
     const id = req.params.id;
-    const jacketMeasurement = await getShirtMeasurementByCustomerId(id);
-    res.send(jacketMeasurement);
+    const shirtMeasurement = await getShirtMeasurementByCustomerId(id);
+    res.send(shirtMeasurement);
+})
+
+app.get("/shirtMeasurement/order/:orderNo", async (req, res) => {
+    const orderNo = req.params.orderNo;
+    const shirtMeasurement = await getShirtMeasurementByOrderNo(orderNo);
+    res.send(shirtMeasurement);
 })
 
 //PANT MEASUREMENT ROUTES
 app.get("/pantMeasurement/customer/:id", async (req, res) => {
     const id = req.params.id;
-    const jacketMeasurement = await getPantMeasurementByCustomerId(id);
-    res.send(jacketMeasurement);
+    const pantMeasurement = await getPantMeasurementByCustomerId(id);
+    res.send(pantMeasurement);
+})
+
+app.get("/pantMeasurement/order/:orderNo", async (req, res) => {
+    const orderNo = req.params.orderNo;
+    const pantMeasurement = await getPantMeasurementByOrderNo(orderNo);
+    res.send(pantMeasurement);
 })
 
 
