@@ -23,7 +23,26 @@ CREATE TABLE `Orders` (
 );
 
 CREATE TABLE `JacketMeasurement` (
-  `measurement_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `customer_id` INT,
+  `orderNo` VARCHAR(255),
+  `date` DATE,
+  `jacket_length` VARCHAR(255),
+  `natural_length` VARCHAR(255),
+  `back_length` VARCHAR(255),
+  `x_back` VARCHAR(255),
+  `half_shoulder` VARCHAR(255),
+  `to_sleeve` VARCHAR(255),
+  `chest` VARCHAR(255),
+  `waist` VARCHAR(255),
+  `collar` VARCHAR(255),
+  `other_notes` TEXT,
+  FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`customer_id`),
+  FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`)
+);
+
+CREATE TABLE `FinalJacketMeasurement` (
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,
@@ -42,7 +61,25 @@ CREATE TABLE `JacketMeasurement` (
 );
 
 CREATE TABLE `ShirtMeasurement` (
-  `measurement_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `customer_id` INT,
+  `orderNo` VARCHAR(255),
+  `date` DATE,
+  `length` VARCHAR(255),
+  `half_shoulder` VARCHAR(255),
+  `to_sleeve` VARCHAR(255),
+  `chest` VARCHAR(255),
+  `waist` VARCHAR(255),
+  `collar` VARCHAR(255),
+  `waist_coat_length` VARCHAR(255),
+  `sherwani_length` VARCHAR(255),
+  `other_notes` TEXT,
+  FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`customer_id`),
+  FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`)
+);
+
+CREATE TABLE `FinalShirtMeasurement` (
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,
@@ -60,7 +97,23 @@ CREATE TABLE `ShirtMeasurement` (
 );
 
 CREATE TABLE `PantMeasurement` (
-  `measurement_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `customer_id` INT,
+  `orderNo` VARCHAR(255),
+  `date` DATE,
+  `length` VARCHAR(255),
+  `inseem` VARCHAR(255),
+  `waist` VARCHAR(255),
+  `hips` VARCHAR(255),
+  `bottom` VARCHAR(255),
+  `knee` VARCHAR(255),
+  `other_notes` TEXT,
+  FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`customer_id`),
+  FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`)
+);
+
+CREATE TABLE `FinalPantMeasurement` (
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,
