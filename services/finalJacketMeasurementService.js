@@ -1,0 +1,25 @@
+import mysql from 'mysql2';
+import dotenv from 'dotenv';
+
+
+dotenv.config();  // This should be at the top
+
+
+const pool = mysql.createPool({
+    host: process.env.SB_DB_HOST,
+    user: process.env.SB_DB_USERNAME,
+    password: process.env.SB_DB_PASSWORD,
+    database: process.env.SB_DB_DATABASE,
+}).promise();
+
+export async function getFinalJacketMeasurementByCustomerId(id) {
+    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`jacket_length`,`natural_length`,`back_length`,`x_back`,`half_shoulder`,`to_sleeve`,`chest`,`waist`,`collar`,`other_notes` FROM `FinalJacketMeasurement` WHERE `customer_id` = ?", [id])
+    const rows = result[0];
+    return rows;
+}
+
+export async function getFinalJacketMeasurementByOrderNo(orderNo) {
+    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`jacket_length`,`natural_length`,`back_length`,`x_back`,`half_shoulder`,`to_sleeve`,`chest`,`waist`,`collar`,`other_notes` FROM `FinalJacketMeasurement` WHERE `orderNo` = ?", [orderNo]);
+    const rows = result[0];
+    return rows;
+}

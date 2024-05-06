@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCustomerById, getCustomers, searchCustomers } from './services/customerService.js';
+import { getCustomerById, getCustomers, searchCustomers, createCustomer } from './services/customerService.js';
 import { getOrders, getOrderById, getOrdersByCustomerId } from './services/orderService.js';
 import { getJacketMeasurementByCustomerId, getJacketMeasurementByOrderNo } from './services/jacketMeasurementService.js';
 import { getShirtMeasurementByCustomerId, getShirtMeasurementByOrderNo } from './services/shirtMeasurementService.js';
@@ -31,6 +31,19 @@ app.get("/customers/search", async (req, res) => {
     } catch (error) {
         console.error('Search error:', error);
         res.status(500).send('Error searching for customers: ' + error.message);
+    }
+});
+
+app.post("/customer", async (req, res) => {
+    const { firstName, lastName, mobile, add1, middleName, add2, add3, add4, email, officePhone, residentialPhone, lastOrderedDate } = req.body;
+    try {
+        if (!firstName || !lastName || !mobile || !add1) {
+            return res.status(400).send({ message: 'Missing required fields. First name, last name, mobile number, and address1 are required.' });
+        }
+        const result = await createCustomer(firstName, lastName, mobile, add1, middleName, add2, add3, add4, email, officePhone, residentialPhone, lastOrderedDate);
+        res.status(201).send({ message: 'Customer created successfully', customerId: result.insertId });
+    } catch (error) {
+        res.status(500).send({ message: 'Failed to create customer', error: error.message });
     }
 });
 
