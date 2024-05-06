@@ -58,4 +58,36 @@ export async function createCustomer(firstName, lastName, mobile, add1, middleNa
     }
 }
 
+export async function updateCustomer(customerId, fields) {
+    // Build the SET part of the SQL query dynamically based on the fields object
+    const setQueryParts = [];
+    const queryValues = [];
+
+    for (const [key, value] of Object.entries(fields)) {
+        if (value !== undefined) { // Only update fields that are provided
+            setQueryParts.push(`${key} = ?`);
+            queryValues.push(value);
+        }
+    }
+
+    if (setQueryParts.length === 0) {
+        throw new Error('No valid fields provided for update');
+    }
+
+    const queryString = `UPDATE Customer SET ${setQueryParts.join(', ')} WHERE customer_id = ?`;
+    queryValues.push(customerId); // Append customerId to the values array for the query
+
+    try {
+        const [result] = await pool.query(queryString, queryValues);
+        if (result.affectedRows === 0) {
+            throw new Error('No customer found with the provided ID.');
+        }
+        return result;
+    } catch (error) {
+        console.error('Failed to update customer:', error);
+        throw error;  // Rethrow the error to be caught by the caller
+    }
+}
+
+
 
