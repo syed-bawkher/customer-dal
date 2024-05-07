@@ -32,3 +32,19 @@ export async function getOrdersByCustomerId(id) {
     const rows = result[0];
     return rows;
 }
+
+// Function to create a new order
+export async function createOrder(orderNo, customerId, date, note) {
+    const query = `
+        INSERT INTO Orders (orderNo, customer_id, date, onote)
+        VALUES (?, ?, ?, ?);
+    `;
+    try {
+        const [result] = await pool.query(query, [orderNo, customerId, date, note]);
+        console.log(`Order created with Order No: ${orderNo}`);
+        return result;
+    } catch (error) {
+        console.error('Failed to create order:', error);
+        throw error;  // Rethrow the error to be caught by the caller
+    }
+}
