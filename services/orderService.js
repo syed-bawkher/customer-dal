@@ -48,3 +48,17 @@ export async function createOrder(orderNo, customerId, date, note) {
         throw error;  // Rethrow the error to be caught by the caller
     }
 }
+
+export async function getOrderDate(orderNo) {
+    try {
+        const [result] = await pool.query("SELECT date FROM Orders WHERE orderNo = ?", [orderNo]);
+        if (result.length > 0) {
+            return result[0].date;  // Assuming 'date' is the column name in the Orders table
+        } else {
+            throw new Error("Order not found");
+        }
+    } catch (error) {
+        console.error('Failed to fetch order date:', error);
+        throw error;
+    }
+}

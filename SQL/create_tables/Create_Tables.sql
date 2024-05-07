@@ -23,7 +23,7 @@ CREATE TABLE `Orders` (
 );
 
 CREATE TABLE `JacketMeasurement` (
-  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,
@@ -42,7 +42,7 @@ CREATE TABLE `JacketMeasurement` (
 );
 
 CREATE TABLE `FinalJacketMeasurement` (
-  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,
@@ -61,7 +61,7 @@ CREATE TABLE `FinalJacketMeasurement` (
 );
 
 CREATE TABLE `ShirtMeasurement` (
-  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,
@@ -79,7 +79,7 @@ CREATE TABLE `ShirtMeasurement` (
 );
 
 CREATE TABLE `FinalShirtMeasurement` (
-  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,
@@ -97,7 +97,7 @@ CREATE TABLE `FinalShirtMeasurement` (
 );
 
 CREATE TABLE `PantMeasurement` (
-  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,
@@ -113,7 +113,7 @@ CREATE TABLE `PantMeasurement` (
 );
 
 CREATE TABLE `FinalPantMeasurement` (
-  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `measurement_id` VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   `customer_id` INT,
   `orderNo` VARCHAR(255),
   `date` DATE,

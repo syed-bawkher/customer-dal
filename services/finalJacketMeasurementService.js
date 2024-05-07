@@ -23,3 +23,32 @@ export async function getFinalJacketMeasurementByOrderNo(orderNo) {
     const rows = result[0];
     return rows;
 }
+
+// Create initial Jacket Measurement
+export async function createFinalJacketMeasurement(data) {
+    const query = `
+        INSERT INTO FinalacketMeasurement (customer_id, orderNo, date, jacket_length, natural_length, back_length, x_back, half_shoulder, to_sleeve, chest, waist, collar, other_notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    `;
+    try {
+        const [result] = await pool.query(query, [
+            data.customer_id,
+            data.orderNo,
+            data.date,
+            data.jacket_length,
+            data.natural_length,
+            data.back_length,
+            data.x_back,
+            data.half_shoulder,
+            data.to_sleeve,
+            data.chest,
+            data.waist,
+            data.collar,
+            data.other_notes
+        ]);
+        return result;
+    } catch (error) {
+        console.error('Failed to create jacket measurement:', error);
+        throw error;
+    }
+}
