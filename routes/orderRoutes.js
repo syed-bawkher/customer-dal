@@ -25,24 +25,24 @@ router.get("/orders/customer/:id", async (req, res) => {
     res.send(orders);
 })
 
-// Create a new order
+// Express route to create a new order
 router.post("/order/:customerId", async (req, res) => {
-    const customerId = req.params.customerId;  // Extract customerId from URL
-    const { orderNo, date, note } = req.body;  // Extract orderNo, date, and note from request body
-
-    // Check if a date is provided; if not, use the current date
-    const orderDate = date || new Date().toISOString().split('T')[0];  // Format the date as 'YYYY-MM-DD'
+    const customerId = req.params.customerId;
+    const { orderNo, date, note } = req.body;
+    const orderDate = date || new Date().toISOString().split('T')[0];
 
     try {
         if (!orderNo || !customerId) {
             return res.status(400).send({ message: 'Missing required order details. Order number and customer ID are required.' });
         }
         const result = await createOrder(orderNo, customerId, orderDate, note);
-        res.status(201).send({ message: 'Order created successfully', order: result });
+        // Ensure the order number is returned in the response
+        res.status(201).send({ message: 'Order created successfully', orderNo: result.orderNo });
     } catch (error) {
         console.error('Failed to create order:', error);
         res.status(500).send({ message: 'Failed to create order', error: error.message });
     }
 });
+
 
 export default router;
