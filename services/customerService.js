@@ -43,13 +43,13 @@ export async function searchCustomers(searchTerm) {
 }
 
 
-export async function createCustomer(firstName, lastName, mobile, add1, middleName = null, add2 = null, add3 = null, add4 = null, email = null, officePhone = null, residentialPhone = null, lastOrderedDate = null) {
+export async function createCustomer(first_name, last_name, mobile, add1, middle_name = null, add2 = null, add3 = null, add4 = null, email = null, office_phone = null, residential_phone = null, last_ordered_date = null) {
     const query = `
         INSERT INTO Customer (first_name, middle_name, last_name, add1, add2, add3, add4, email, mobile, office_phone, residential_phone, last_ordered_date)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     try {
-        const [result] = await pool.query(query, [firstName, middleName, lastName, add1, add2, add3, add4, email, mobile, officePhone, residentialPhone, lastOrderedDate]);
+        const [result] = await pool.query(query, [first_name, middle_name, last_name, add1, add2, add3, add4, email, mobile, office_phone, residential_phone, last_ordered_date]);
         console.log(`Customer created with ID: ${result.insertId}`);
         return result;
     } catch (error) {

@@ -35,12 +35,12 @@ router.get("/customers/search", async (req, res) => {
 
 // Create a new customer
 router.post("/customer", async (req, res) => {
-    const { firstName, lastName, mobile, add1, middleName, add2, add3, add4, email, officePhone, residentialPhone, lastOrderedDate } = req.body;
+    const { first_name, last_name, mobile, add1, middle_name, add2, add3, add4, email, office_phone, residential_phone, last_ordered_date } = req.body;
     try {
-        if (!firstName || !lastName || !mobile || !add1) {
+        if (!first_name || !last_name || !mobile || !add1) {
             return res.status(400).send({ message: 'Missing required fields. First name, last name, mobile number, and address1 are required.' });
         }
-        const result = await createCustomer(firstName, lastName, mobile, add1, middleName, add2, add3, add4, email, officePhone, residentialPhone, lastOrderedDate);
+        const result = await createCustomer(first_name, last_name, mobile, add1, middle_name, add2, add3, add4, email, office_phone, residential_phone, last_ordered_date);
         res.status(201).send({ message: 'Customer created successfully', customerId: result.insertId });
     } catch (error) {
         res.status(500).send({ message: 'Failed to create customer', error: error.message });
