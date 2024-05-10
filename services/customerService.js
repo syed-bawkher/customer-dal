@@ -90,4 +90,32 @@ export async function updateCustomer(customerId, fields) {
 }
 
 
+export async function deleteCustomer(customerId) {
+    // Start by nullifying the customer_id in all related tables
+    const relatedTables = ['Orders', 'JacketMeasurement', 'FinalJacketMeasurement', 'ShirtMeasurement', 'FinalShirtMeasurement', 'PantMeasurement', 'FinalPantMeasurement', 'Items'];
+    try {
+        await pool.getConnection(async conn => {
+            await conn.beginTransaction();  // Start a transaction
+
+            for (const table of relatedTables) {
+                const updateQuery = `UPDATE ${table} SET customer_id = NULL WHERE customer_id = ?`;
+                await conn.query(updateQuery, [customerId]);
+            }
+
+            // Now, delete the customer
+            const deleteQuery = "DELETE FROM Customer WHERE customer_id = ?";
+            const [deleteResult] = await conn.query(deleteQuery, [customerId]);
+
+            if (deleteResult.affectedRows === 0) {
+                throw new Error('No customer found with the provided ID.');
+            }
+
+            await conn.commit();  // Commit the transaction
+            console.log(`Customer deleted successfully and all references were set to NULL.`);
+        });
+    } catch (error) {
+        console.error('Failed to delete customer:', error);
+        throw error;  // Rethrow the error to be caught by the caller
+    }
+}
 
