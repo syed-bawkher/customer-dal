@@ -106,3 +106,29 @@ export async function deleteItem(itemId) {
         throw error;
     }
 }
+
+export async function createItems(orderNo, items) {
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+        const results = [];
+
+        for (const item of items) {
+            const { item_name, item_type, measurement_id, fabric_name, lining_name } = item;
+            const columns = `${item_type.toLowerCase()}_measurement_id, orderNo, item_name, item_type, fabric_name, lining_name`;
+            const values = '?, ?, ?, ?, ?, ?';
+            const sql = `INSERT INTO Items (${columns}) VALUES (${values});`;
+            const [result] = await connection.query(sql, [measurement_id, orderNo, item_name, item_type, fabric_name, lining_name]);
+            results.push(result);
+        }
+
+        await connection.commit();
+        return results;
+    } catch (error) {
+        await connection.rollback();
+        console.error('Transaction failed, rolled back.', error);
+        throw error;
+    } finally {
+        connection.release();
+    }
+}

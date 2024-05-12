@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  getAllItems, getItemById, createJacket, createShirt, createPant, updateItem, deleteItem
+  getAllItems, getItemById, createJacket, createShirt, createPant, updateItem, deleteItem, createItems
 } from '../services/itemsService.js';
 
 const router = express.Router();
@@ -17,6 +17,24 @@ router.get("/items", async (req, res) => {
         res.status(500).send('Error retrieving items: ' + error.message);
     }
 });
+
+// Create multiple items for the same order
+router.post("/items", async (req, res) => {
+    const { orderNo, items } = req.body;
+    try {
+        if (!items || items.length === 0) {
+            return res.status(400).send({ message: 'No items provided' });
+        }
+        const result = await createItems(orderNo, items); // Assuming createItems handles multiple items
+        res.status(201).send({
+            message: 'Items created successfully',
+            itemsCreated: result.length
+        });
+    } catch (error) {
+        res.status(500).send({ message: 'Failed to create items', error: error.message });
+    }
+});
+
 
 // Get an item by ID
 router.get("/item/:id", async (req, res) => {

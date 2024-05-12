@@ -1,5 +1,6 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
+import { v4 as uuidv4 } from 'uuid'; // Import uuid function
 import { getOrderDate } from './orderService.js';
 
 
@@ -25,15 +26,17 @@ export async function getShirtMeasurementByOrderNo(orderNo) {
     return rows;
 }
 
-// Create initial Shirt Measurement
 export async function createShirtMeasurement(data) {
     try {
-        const orderDate = await getOrderDate(data.orderNo);
+        const measurementId = uuidv4(); // Generate a UUID for the measurement
+        const orderDate = await getOrderDate(data.orderNo); // Retrieve order date based on order number
+
         const query = `
-            INSERT INTO ShirtMeasurement (customer_id, orderNo, date, length, half_shoulder, to_sleeve, chest, waist, collar, waist_coat_length, sherwani_length, other_notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO ShirtMeasurement (measurement_id, customer_id, orderNo, date, length, half_shoulder, to_sleeve, chest, waist, collar, waist_coat_length, sherwani_length, other_notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
-        const [result] = await pool.query(query, [
+        await pool.query(query, [
+            measurementId,  // Use the generated UUID
             data.customer_id,
             data.orderNo,
             orderDate,
@@ -47,7 +50,8 @@ export async function createShirtMeasurement(data) {
             data.sherwani_length,
             data.other_notes
         ]);
-        return result;
+
+        return { measurement_id: measurementId }; // Return the UUID used in the insert
     } catch (error) {
         console.error('Failed to create shirt measurement:', error);
         throw error;
