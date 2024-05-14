@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  getAllItems, getItemById, createJacket, createShirt, createPant, updateItem, deleteItem, createItems
+  getAllItems, getItemById, createJacket, createShirt, createPant, updateItem, deleteItem, createItems, getItemsByOrderNo
 } from '../services/itemsService.js';
 
 const router = express.Router();
@@ -34,6 +34,18 @@ router.post("/items", async (req, res) => {
         res.status(500).send({ message: 'Failed to create items', error: error.message });
     }
 });
+
+router.get("/items/order/:orderNo", async (req, res) => {
+    const orderNo = req.params.orderNo;
+    try {
+        const items = await getItemsByOrderNo(orderNo);
+        res.send(items);
+    }
+    catch (error) {
+        console.error('Error getting items:', error);
+        res.status(500).send('Error retrieving items: ' + error.message);
+    }
+})
 
 
 // Get an item by ID

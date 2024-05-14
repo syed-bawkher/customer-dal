@@ -24,6 +24,11 @@ export async function getItemById(itemId) {
     return rows[0];
 }
 
+export async function getItemsByOrderNo(orderNo) {
+    const [rows] = await pool.query("SELECT * FROM Items WHERE orderNo = ?", [orderNo]);
+    return rows;
+}
+
 function createItemQuery(orderNo, item_name, item_type, measurement_id, fabric_name, lining_name) {
     const columns = `${item_type}_measurement_id, orderNo, item_name, item_type, fabric_name, lining_name`;
     const values = '?, ?, ?, ?, ?, ?';
