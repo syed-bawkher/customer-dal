@@ -13,13 +13,13 @@ const pool = mysql.createPool({
 }).promise();
 
 export async function getFinalJacketMeasurementByCustomerId(id) {
-    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`jacket_length`,`natural_length`,`back_length`,`x_back`,`half_shoulder`,`to_sleeve`,`chest`,`waist`,`collar`,`other_notes` FROM `FinalJacketMeasurement` WHERE `customer_id` = ?", [id])
+    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`jacket_length`,`natural_length`,`back_length`,`x_back`,`half_shoulder`,`to_sleeve`,`chest`,`waist`,`collar`,`waist_coat_length`,`sherwani_length`,`other_notes` FROM `FinalJacketMeasurement` WHERE `customer_id` = ?", [id])
     const rows = result[0];
     return rows;
 }
 
 export async function getFinalJacketMeasurementByOrderNo(orderNo) {
-    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`jacket_length`,`natural_length`,`back_length`,`x_back`,`half_shoulder`,`to_sleeve`,`chest`,`waist`,`collar`,`other_notes` FROM `FinalJacketMeasurement` WHERE `orderNo` = ?", [orderNo]);
+    const result = await pool.query("SELECT `measurement_id`,`date`,`orderNo`,`jacket_length`,`natural_length`,`back_length`,`x_back`,`half_shoulder`,`to_sleeve`,`chest`,`waist`,`collar`,`waist_coat_length`,`sherwani_length`,`other_notes` FROM `FinalJacketMeasurement` WHERE `orderNo` = ?", [orderNo]);
     const rows = result[0];
     return rows;
 }
@@ -27,8 +27,8 @@ export async function getFinalJacketMeasurementByOrderNo(orderNo) {
 // Create initial Jacket Measurement
 export async function createFinalJacketMeasurement(data) {
     const query = `
-        INSERT INTO FinalacketMeasurement (customer_id, orderNo, date, jacket_length, natural_length, back_length, x_back, half_shoulder, to_sleeve, chest, waist, collar, other_notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        INSERT INTO FinalacketMeasurement (customer_id, orderNo, date, jacket_length, natural_length, back_length, x_back, half_shoulder, to_sleeve, chest, waist, collar, waist_coat_length, sherwani_length, other_notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
     try {
         const [result] = await pool.query(query, [
@@ -44,6 +44,8 @@ export async function createFinalJacketMeasurement(data) {
             data.chest,
             data.waist,
             data.collar,
+            data.waist_coat_length,
+            data.sherwani_length,
             data.other_notes
         ]);
         return result;
