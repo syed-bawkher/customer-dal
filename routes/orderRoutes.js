@@ -1,5 +1,5 @@
 import express from "express";
-import { getOrders, getOrderById, getOrdersByCustomerId, createOrder } from "../services/orderService.js";
+import { getOrders, getOrderById, getOrdersByCustomerId, createOrder, deleteOrder } from "../services/orderService.js";
 
 const router = express.Router();
 
@@ -41,6 +41,18 @@ router.post("/order/:customerId", async (req, res) => {
     } catch (error) {
         console.error('Failed to create order:', error);
         res.status(500).send({ message: 'Failed to create order', error: error.message });
+    }
+});
+
+// Delete an order by ID
+router.delete("/order/:id", async (req, res) => {
+    const orderNo = req.params.id;
+    try {
+        await deleteOrder(orderNo);
+        res.status(200).send({ message: `Order ${orderNo} and all associated entities have been deleted successfully.` });
+    } catch (error) {
+        console.error('Failed to delete order:', error);
+        res.status(500).send({ message: 'Failed to delete order', error: error.message });
     }
 });
 
