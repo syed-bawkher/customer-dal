@@ -9,13 +9,11 @@ import itemsRoutes from './routes/itemsRoutes.js';
 
 const app = express();
 
-app.use(cors());
-
-/*
 app.use(cors({
-    origin: 'http://example.com'  // Replace 'http://example.com' with the URL of your front-end app
+    origin: '*', // Replace '*' with your specific origin if possible
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
- */
 
 
 app.use(express.json()); // to parse JSON bodies
