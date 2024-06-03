@@ -55,3 +55,30 @@ export async function createShirtMeasurement(data) {
         throw error;
     }
 }
+
+export async function updateShirtMeasurement(measurementId, data) {
+    try {
+        let query = 'UPDATE ShirtMeasurement SET ';
+        const values = [];
+
+        Object.keys(data).forEach((key, index) => {
+            if (data[key] !== undefined) {
+                query += `${key} = ?`;
+                if (index < Object.keys(data).length - 1) {
+                    query += ', ';
+                }
+                values.push(data[key]);
+            }
+        });
+
+        query += ' WHERE measurement_id = ?';
+        values.push(measurementId);
+
+        await pool.query(query, values);
+
+        return { success: true };
+    } catch (error) {
+        console.error('Failed to update shirt measurement:', error);
+        throw error;
+    }
+}

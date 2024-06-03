@@ -1,4 +1,4 @@
-import { getPantMeasurementByCustomerId, getPantMeasurementByOrderNo, createPantMeasurement } from '../services/pantMeasurementService.js';
+import { getPantMeasurementByCustomerId, getPantMeasurementByOrderNo, createPantMeasurement, updatePantMeasurement } from '../services/pantMeasurementService.js';
 import express from 'express';
 
 const router = express.Router();
@@ -29,6 +29,19 @@ router.post("/pantMeasurement/:customerid/:orderNo", async (req, res) => {
     } catch (error) {
         console.error('Error creating pant measurement:', error);
         res.status(500).send({ message: 'Failed to create pant measurement', error: error.message });
+    }
+});
+
+// Update pant measurement
+router.put("/pantMeasurement/:measurementId", async (req, res) => {
+    try {
+        const { measurementId } = req.params;
+        const data = req.body;
+        await updatePantMeasurement(measurementId, data);
+        res.send({ message: 'Pant measurement updated successfully' });
+    } catch (error) {
+        console.error('Error updating pant measurement:', error);
+        res.status(500).send({ message: 'Failed to update pant measurement', error: error.message });
     }
 });
 

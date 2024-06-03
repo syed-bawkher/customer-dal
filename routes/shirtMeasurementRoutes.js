@@ -1,4 +1,4 @@
-import { getShirtMeasurementByCustomerId, getShirtMeasurementByOrderNo, createShirtMeasurement } from '../services/shirtMeasurementService.js';
+import { getShirtMeasurementByCustomerId, getShirtMeasurementByOrderNo, createShirtMeasurement, updateShirtMeasurement } from '../services/shirtMeasurementService.js';
 import express from 'express';
 
 const router = express.Router();
@@ -29,6 +29,19 @@ router.post("/shirtMeasurement/:customerid/:orderNo", async (req, res) => {
     } catch (error) {
         console.error('Error creating shirt measurement:', error);
         res.status(500).send({ message: 'Failed to create shirt measurement', error: error.message });
+    }
+});
+
+// Update shirt measurement
+router.put("/shirtMeasurement/:measurementId", async (req, res) => {
+    try {
+        const { measurementId } = req.params;
+        const data = req.body;
+        await updateShirtMeasurement(measurementId, data);
+        res.send({ message: 'Shirt measurement updated successfully' });
+    } catch (error) {
+        console.error('Error updating shirt measurement:', error);
+        res.status(500).send({ message: 'Failed to update shirt measurement', error: error.message });
     }
 });
 
