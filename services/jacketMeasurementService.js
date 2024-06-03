@@ -61,3 +61,33 @@ export async function createJacketMeasurement(data) {
         throw error;
     }
 }
+
+export async function updateJacketMeasurement(measurementId, data) {
+    try {
+        // Prepare the dynamic part of the query and the values array
+        let query = 'UPDATE JacketMeasurement SET ';
+        const values = [];
+        
+        // Iterate through the data object and append to the query string and values array
+        Object.keys(data).forEach((key, index) => {
+            if (data[key] !== undefined) {
+                query += `${key} = ?`;
+                if (index < Object.keys(data).length - 1) {
+                    query += ', ';
+                }
+                values.push(data[key]);
+            }
+        });
+        
+        query += ' WHERE measurement_id = ?';
+        values.push(measurementId);
+
+        // Execute the update query
+        await pool.query(query, values);
+        
+        return { success: true };
+    } catch (error) {
+        console.error('Failed to update jacket measurement:', error);
+        throw error;
+    }
+}
