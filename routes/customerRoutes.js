@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCustomerById, getCustomers, searchCustomers, createCustomer, updateCustomer } from '../services/customerService.js';
+import { getCustomerById, getCustomers, searchCustomers, createCustomer, updateCustomer, mergeCustomers } from '../services/customerService.js';
 
 const router = express.Router();
 
@@ -60,6 +60,21 @@ router.put("/customer/:id", async (req, res) => {
     } catch (error) {
         console.error('Failed to update customer:', error);
         res.status(500).send({ message: 'Failed to update customer', error: error.message });
+    }
+});
+
+// Merge customers
+router.post("/customers/merge", async (req, res) => {
+    const { customerIds } = req.body;
+    if (!Array.isArray(customerIds) || customerIds.length < 2) {
+        return res.status(400).send({ message: 'You must provide an array of at least two customer IDs to merge.' });
+    }
+    try {
+        await mergeCustomers(customerIds);
+        res.send({ message: 'Customers merged successfully into customer ID: ' + customerIds[0] });
+    } catch (error) {
+        console.error('Failed to merge customers:', error);
+        res.status(500).send({ message: 'Failed to merge customers', error: error.message });
     }
 });
 
