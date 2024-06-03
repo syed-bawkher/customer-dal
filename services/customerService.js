@@ -168,3 +168,57 @@ export async function deleteCustomer(customerId) {
     throw error; // Rethrow the error to be caught by the caller
   }
 }
+
+export async function mergeCustomers(customerIds) {
+  console.log("Merging customers");
+  if (!Array.isArray(customerIds) || customerIds.length < 2) {
+    throw new Error(
+      "You must provide an array of at least two customer IDs to merge."
+    );
+  }
+
+  const targetCustomerId = customerIds[0];
+  const otherCustomerIds = customerIds.slice(1);
+
+  const relatedTables = [
+    "Orders",
+    "JacketMeasurement",
+    "FinalJacketMeasurement",
+    "ShirtMeasurement",
+    "FinalShirtMeasurement",
+    "PantMeasurement",
+    "FinalPantMeasurement",
+  ];
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction(); // Start a transaction
+    console.log(`Merging customers: ${customerIds.join(", ")}`);
+
+    for (const table of relatedTables) {
+      const updateQuery = `UPDATE ${table} SET customer_id = ? WHERE customer_id IN (?)`;
+      const [updateResult] = await conn.query(updateQuery, [
+        targetCustomerId,
+        otherCustomerIds,
+      ]);
+      console.log(
+        `Updated ${updateResult.affectedRows} rows in table ${table}`
+      );
+    }
+
+    const deleteQuery = "DELETE FROM Customer WHERE customer_id IN (?)";
+    const [deleteResult] = await conn.query(deleteQuery, [otherCustomerIds]);
+    console.log(`Deleted ${deleteResult.affectedRows} customer(s)`);
+
+    await conn.commit(); // Commit the transaction
+    console.log(
+      `Customers merged successfully into customer ID: ${targetCustomerId}`
+    );
+  } catch (error) {
+    await conn.rollback(); // Rollback the transaction in case of error
+    console.error("Failed to merge customers:", error);
+    throw error; // Rethrow the error to be caught by the caller
+  } finally {
+    conn.release(); // Release the connection back to the pool
+  }
+}
