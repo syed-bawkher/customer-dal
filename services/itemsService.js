@@ -29,16 +29,16 @@ export async function getItemsByOrderNo(orderNo) {
     return rows;
 }
 
-function createItemQuery(orderNo, item_name, item_type, measurement_id, fabric_name, lining_name) {
-    const columns = `${item_type}_measurement_id, orderNo, item_name, item_type, fabric_name, lining_name`;
+function createItemQuery(orderNo, item_name, item_type, measurement_id, fabric_id, lining_fabric_id) {
+    const columns = `${item_type}_measurement_id, orderNo, item_name, item_type, fabric_id, lining_fabric_id`;
     const values = '?, ?, ?, ?, ?, ?';
     const sql = `INSERT INTO Items (${columns}) VALUES (${values});`;
-    return pool.query(sql, [measurement_id, orderNo, item_name, item_type, fabric_name, lining_name]);
+    return pool.query(sql, [measurement_id, orderNo, item_name, item_type, fabric_id, lining_fabric_id]);
 }
 
-export async function createJacket(orderNo, item_name, jacket_measurement_id, fabric_name, lining_name) {
+export async function createJacket(orderNo, item_name, jacket_measurement_id, fabric_id, lining_fabric_id) {
     try {
-        const [result] = await createItemQuery(orderNo, item_name, 'jacket', jacket_measurement_id, fabric_name, lining_name);
+        const [result] = await createItemQuery(orderNo, item_name, 'jacket', jacket_measurement_id, fabric_id, lining_fabric_id);
         console.log(`Jacket created with ID: ${result.insertId}`);
         return result;
     } catch (error) {
@@ -47,9 +47,9 @@ export async function createJacket(orderNo, item_name, jacket_measurement_id, fa
     }
 }
 
-export async function createShirt(orderNo, item_name, shirt_measurement_id, fabric_name, lining_name) {
+export async function createShirt(orderNo, item_name, shirt_measurement_id, fabric_id, lining_fabric_id) {
     try {
-        const [result] = await createItemQuery(orderNo, item_name, 'shirt', shirt_measurement_id, fabric_name, lining_name);
+        const [result] = await createItemQuery(orderNo, item_name, 'shirt', shirt_measurement_id, fabric_id, lining_fabric_id);
         console.log(`Shirt created with ID: ${result.insertId}`);
         return result;
     } catch (error) {
@@ -58,9 +58,9 @@ export async function createShirt(orderNo, item_name, shirt_measurement_id, fabr
     }
 }
 
-export async function createPant(orderNo, item_name, pant_measurement_id, fabric_name, lining_name) {
+export async function createPant(orderNo, item_name, pant_measurement_id, fabric_id, lining_fabric_id) {
     try {
-        const [result] = await createItemQuery(orderNo, item_name, 'pant', pant_measurement_id, fabric_name, lining_name);
+        const [result] = await createItemQuery(orderNo, item_name, 'pant', pant_measurement_id, fabric_id, lining_fabric_id);
         console.log(`Pant created with ID: ${result.insertId}`);
         return result;
     } catch (error) {
@@ -119,11 +119,11 @@ export async function createItems(orderNo, items) {
         const results = [];
 
         for (const item of items) {
-            const { item_name, item_type, measurement_id, fabric_name, lining_name } = item;
-            const columns = `${item_type.toLowerCase()}_measurement_id, orderNo, item_name, item_type, fabric_name, lining_name`;
+            const { item_name, item_type, measurement_id, fabric_id, lining_fabric_id } = item;
+            const columns = `${item_type.toLowerCase()}_measurement_id, orderNo, item_name, item_type, fabric_id, lining_fabric_id`;
             const values = '?, ?, ?, ?, ?, ?';
             const sql = `INSERT INTO Items (${columns}) VALUES (${values});`;
-            const [result] = await connection.query(sql, [measurement_id, orderNo, item_name, item_type, fabric_name, lining_name]);
+            const [result] = await connection.query(sql, [measurement_id, orderNo, item_name, item_type, fabric_id, lining_fabric_id]);
             results.push(result);
         }
 
