@@ -1,5 +1,6 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
+import { createFabricIfNotExist } from './fabricService.js';
 
 
 dotenv.config();  // This should be at the top
@@ -29,7 +30,12 @@ export async function getItemsByOrderNo(orderNo) {
     return rows;
 }
 
-function createItemQuery(orderNo, item_name, item_type, measurement_id, fabric_id, lining_fabric_id) {
+async function createItemQuery(orderNo, item_name, item_type, measurement_id, fabric_id, lining_fabric_id) {
+    // Ensure fabric_id exists if it's not null
+    if (fabric_id) await createFabricIfNotExist(fabric_id);
+    // Ensure lining_fabric_id exists if it's not null
+    if (lining_fabric_id) await createFabricIfNotExist(lining_fabric_id);
+
     const columns = `${item_type}_measurement_id, orderNo, item_name, item_type, fabric_id, lining_fabric_id`;
     const values = '?, ?, ?, ?, ?, ?';
     const sql = `INSERT INTO Items (${columns}) VALUES (${values});`;
@@ -122,6 +128,12 @@ export async function createItems(orderNo, items) {
             const { item_name, item_type, measurement_id, fabric_id, lining_fabric_id } = item;
             const columns = `${item_type.toLowerCase()}_measurement_id, orderNo, item_name, item_type, fabric_id, lining_fabric_id`;
             const values = '?, ?, ?, ?, ?, ?';
+
+            // Ensure fabric_id exists if it's not null
+            if (fabric_id) await createFabricIfNotExist(fabric_id);
+            // Ensure lining_fabric_id exists if it's not null
+            if (lining_fabric_id) await createFabricIfNotExist(lining_fabric_id);
+
             const sql = `INSERT INTO Items (${columns}) VALUES (${values});`;
             const [result] = await connection.query(sql, [measurement_id, orderNo, item_name, item_type, fabric_id, lining_fabric_id]);
             results.push(result);
