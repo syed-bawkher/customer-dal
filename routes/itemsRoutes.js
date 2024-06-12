@@ -66,9 +66,9 @@ router.get("/item/:id", async (req, res) => {
 
 // Create a new jacket
 router.post("/item/jacket", async (req, res) => {
-    const { orderNo, item_name, jacket_measurement_id, fabric_name, lining_name } = req.body;
+    const { orderNo, item_name, jacket_measurement_id, fabric_id, lining_id } = req.body;
     try {
-        const result = await createJacket(orderNo, item_name, jacket_measurement_id, fabric_name, lining_name);
+        const result = await createJacket(orderNo, item_name, jacket_measurement_id, fabric_id, lining_fabric_id);
         res.status(201).send({ message: 'Jacket created successfully', itemId: result.insertId });
     } catch (error) {
         res.status(500).send({ message: 'Failed to create jacket', error: error.message });
@@ -77,9 +77,9 @@ router.post("/item/jacket", async (req, res) => {
 
 // Create a new shirt
 router.post("/item/shirt", async (req, res) => {
-    const { orderNo, item_name, shirt_measurement_id, fabric_name, lining_name } = req.body;
+    const { orderNo, item_name, shirt_measurement_id, fabric_id, lining_fabric_id } = req.body;
     try {
-        const result = await createShirt(orderNo, item_name, shirt_measurement_id, fabric_name, lining_name);
+        const result = await createShirt(orderNo, item_name, shirt_measurement_id, fabric_id, lining_fabric_id);
         res.status(201).send({ message: 'Shirt created successfully', itemId: result.insertId });
     } catch (error) {
         res.status(500).send({ message: 'Failed to create shirt', error: error.message });
@@ -88,9 +88,9 @@ router.post("/item/shirt", async (req, res) => {
 
 // Create a new pant
 router.post("/item/pant", async (req, res) => {
-    const { orderNo, item_name, pant_measurement_id, fabric_name, lining_name } = req.body;
+    const { orderNo, item_name, pant_measurement_id, fabric_id, lining_fabric_id } = req.body;
     try {
-        const result = await createPant(orderNo, item_name, pant_measurement_id, fabric_name, lining_name);
+        const result = await createPant(orderNo, item_name, pant_measurement_id, fabric_id, lining_fabric_id);
         res.status(201).send({ message: 'Pant created successfully', itemId: result.insertId });
     } catch (error) {
         res.status(500).send({ message: 'Failed to create pant', error: error.message });
