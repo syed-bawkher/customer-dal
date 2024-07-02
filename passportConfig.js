@@ -12,7 +12,7 @@ const pool = mysql.createPool({
 
 passport.use(new BearerStrategy(async (token, done) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM users WHERE token = ?', [token]);
+        const [rows] = await pool.query('SELECT * FROM Users WHERE token = ?', [token]);
         if (rows.length === 0) {
             return done(null, false);
         }

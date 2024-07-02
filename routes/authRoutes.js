@@ -27,7 +27,7 @@ router.post('/auth/register', async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const [result] = await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword]);
+        const [result] = await pool.query('INSERT INTO Users (username, password) VALUES (?, ?)', [username, hashedPassword]);
         res.status(201).json({ message: 'User registered successfully' });
     } catch (err) {
         res.status(500).json({ message: 'Error registering user', error: err.message });
@@ -43,7 +43,7 @@ router.post('/auth/login', async (req, res) => {
     }
 
     try {
-        const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+        const [rows] = await pool.query('SELECT * FROM Users WHERE username = ?', [username]);
         if (rows.length === 0) {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
@@ -55,7 +55,7 @@ router.post('/auth/login', async (req, res) => {
         }
 
         const token = jwt.sign({ id: user.id }, 'your_jwt_secret', { expiresIn: '1h' });
-        await pool.query('UPDATE users SET token = ? WHERE id = ?', [token, user.id]);
+        await pool.query('UPDATE Users SET token = ? WHERE id = ?', [token, user.id]);
         res.json({ token });
     } catch (err) {
         res.status(500).json({ message: 'Error logging in', error: err.message });
