@@ -1,32 +1,33 @@
 import express from "express";
 import { getOrders, getOrderById, getOrdersByCustomerId, createOrder, deleteOrder } from "../services/orderService.js";
+import passport from '../passportConfig.js';
 
 const router = express.Router();
 
 //ORDER ROUTES
 
 //get all orders
-router.get("/orders", async (req, res) => {
+router.get("/orders", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const orders = await getOrders();
     res.send(orders);
 })
 
 // Get an order by ID
-router.get("/order/:id", async (req, res) => {
+router.get("/order/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const id = req.params.id;
     const order = await getOrderById(id);
     res.send(order);
 })
 
 //get orders by customer id
-router.get("/orders/customer/:id", async (req, res) => {
+router.get("/orders/customer/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const id = req.params.id;
     const orders = await getOrdersByCustomerId(id);
     res.send(orders);
 })
 
 // Express route to create a new order
-router.post("/order/:customerId", async (req, res) => {
+router.post("/order/:customerId", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const customerId = req.params.customerId;
     const { orderNo, date, note } = req.body;
     const orderDate = date || new Date().toISOString().split('T')[0];
@@ -45,7 +46,7 @@ router.post("/order/:customerId", async (req, res) => {
 });
 
 // Delete an order by ID
-router.delete("/order/:id", async (req, res) => {
+router.delete("/order/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const orderNo = req.params.id;
     try {
         await deleteOrder(orderNo);

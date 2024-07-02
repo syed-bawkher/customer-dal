@@ -2,13 +2,14 @@ import express from 'express';
 import {
   getAllItems, getItemById, createJacket, createShirt, createPant, updateItem, deleteItem, createItems, getItemsByOrderNo
 } from '../services/itemsService.js';
+import passport from '../passportConfig.js';
 
 const router = express.Router();
 
 // ITEM ROUTES
 
 // Get all items
-router.get("/items", async (req, res) => {
+router.get("/items", passport.authenticate('bearer', { session: false }), async (req, res) => {
     try {
         const items = await getAllItems();
         res.send(items);
@@ -19,7 +20,7 @@ router.get("/items", async (req, res) => {
 });
 
 // Create multiple items for the same order
-router.post("/items", async (req, res) => {
+router.post("/items", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { orderNo, items } = req.body;
     try {
         if (!items || items.length === 0) {
@@ -35,7 +36,7 @@ router.post("/items", async (req, res) => {
     }
 });
 
-router.get("/items/order/:orderNo", async (req, res) => {
+router.get("/items/order/:orderNo", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const orderNo = req.params.orderNo;
     try {
         const items = await getItemsByOrderNo(orderNo);
@@ -49,7 +50,7 @@ router.get("/items/order/:orderNo", async (req, res) => {
 
 
 // Get an item by ID
-router.get("/item/:id", async (req, res) => {
+router.get("/item/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const id = req.params.id;
     try {
         const item = await getItemById(id);
@@ -65,7 +66,7 @@ router.get("/item/:id", async (req, res) => {
 });
 
 // Create a new jacket
-router.post("/item/jacket", async (req, res) => {
+router.post("/item/jacket", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { orderNo, item_name, jacket_measurement_id, fabric_id, lining_id } = req.body;
     try {
         const result = await createJacket(orderNo, item_name, jacket_measurement_id, fabric_id, lining_fabric_id);
@@ -76,7 +77,7 @@ router.post("/item/jacket", async (req, res) => {
 });
 
 // Create a new shirt
-router.post("/item/shirt", async (req, res) => {
+router.post("/item/shirt", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { orderNo, item_name, shirt_measurement_id, fabric_id, lining_fabric_id } = req.body;
     try {
         const result = await createShirt(orderNo, item_name, shirt_measurement_id, fabric_id, lining_fabric_id);
@@ -87,7 +88,7 @@ router.post("/item/shirt", async (req, res) => {
 });
 
 // Create a new pant
-router.post("/item/pant", async (req, res) => {
+router.post("/item/pant", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { orderNo, item_name, pant_measurement_id, fabric_id, lining_fabric_id } = req.body;
     try {
         const result = await createPant(orderNo, item_name, pant_measurement_id, fabric_id, lining_fabric_id);
@@ -98,7 +99,7 @@ router.post("/item/pant", async (req, res) => {
 });
 
 // Update an existing item
-router.put("/item/:id", async (req, res) => {
+router.put("/item/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { id } = req.params;
     try {
         const updateResult = await updateItem(id, req.body);
@@ -114,7 +115,7 @@ router.put("/item/:id", async (req, res) => {
 });
 
 // Delete an item
-router.delete("/item/:id", async (req, res) => {
+router.delete("/item/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { id } = req.params;
     try {
         const deleteResult = await deleteItem(id);

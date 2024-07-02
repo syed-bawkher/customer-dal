@@ -6,13 +6,14 @@ import {
     updateFabric,
     deleteFabric
 } from '../services/fabricService.js';
+import passport from '../passportConfig.js';
 
 const router = express.Router();
 
 // FABRIC ROUTES
 
 // Get all fabrics
-router.get("/fabrics", async (req, res) => {
+router.get("/fabrics", passport.authenticate('bearer', { session: false }), async (req, res) => {
     try {
         const fabrics = await getAllFabrics();
         res.send(fabrics);
@@ -23,7 +24,7 @@ router.get("/fabrics", async (req, res) => {
 });
 
 // Get a fabric by ID
-router.get("/fabric/:id", async (req, res) => {
+router.get("/fabric/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const id = req.params.id;
     try {
         const fabric = await getFabricById(id);
@@ -39,7 +40,7 @@ router.get("/fabric/:id", async (req, res) => {
 });
 
 // Create a new fabric
-router.post("/fabric", async (req, res) => {
+router.post("/fabric", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const fabric = req.body;
     try {
         const result = await createFabric(fabric);
@@ -50,7 +51,7 @@ router.post("/fabric", async (req, res) => {
 });
 
 // Update an existing fabric
-router.put("/fabric/:id", async (req, res) => {
+router.put("/fabric/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { id } = req.params;
     try {
         const updateResult = await updateFabric(id, req.body);
@@ -66,7 +67,7 @@ router.put("/fabric/:id", async (req, res) => {
 });
 
 // Delete a fabric
-router.delete("/fabric/:id", async (req, res) => {
+router.delete("/fabric/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { id } = req.params;
     try {
         const deleteResult = await deleteFabric(id);
