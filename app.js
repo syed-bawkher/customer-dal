@@ -7,6 +7,7 @@ import shirtMeasurementRoutes from './routes/shirtMeasurementRoutes.js';
 import pantMeasurementRoutes from './routes/pantMeasurementRoutes.js';
 import itemsRoutes from './routes/itemsRoutes.js';
 import fabricRoutes from './routes/fabricRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(shirtMeasurementRoutes);
 app.use(pantMeasurementRoutes);
 app.use(itemsRoutes);
 app.use(fabricRoutes);
+app.use(authRoutes);
 
 
 //ERROR HANDLING

@@ -36,6 +36,8 @@ CREATE TABLE `JacketMeasurement` (
   `chest` VARCHAR(255),
   `waist` VARCHAR(255),
   `collar` VARCHAR(255),
+  `waist_coat_length` VARCHAR(255),
+  `sherwani_length` VARCHAR(255),
   `other_notes` TEXT,
   FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`customer_id`),
   FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`)
@@ -55,6 +57,8 @@ CREATE TABLE `FinalJacketMeasurement` (
   `chest` VARCHAR(255),
   `waist` VARCHAR(255),
   `collar` VARCHAR(255),
+  `waist_coat_length` VARCHAR(255),
+  `sherwani_length` VARCHAR(255),
   `other_notes` TEXT,
   FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`customer_id`),
   FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`)
@@ -71,8 +75,6 @@ CREATE TABLE `ShirtMeasurement` (
   `chest` VARCHAR(255),
   `waist` VARCHAR(255),
   `collar` VARCHAR(255),
-  `waist_coat_length` VARCHAR(255),
-  `sherwani_length` VARCHAR(255),
   `other_notes` TEXT,
   FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`customer_id`),
   FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`)
@@ -89,8 +91,6 @@ CREATE TABLE `FinalShirtMeasurement` (
   `chest` VARCHAR(255),
   `waist` VARCHAR(255),
   `collar` VARCHAR(255),
-  `waist_coat_length` VARCHAR(255),
-  `sherwani_length` VARCHAR(255),
   `other_notes` TEXT,
   FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`customer_id`),
   FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`)
@@ -148,4 +148,13 @@ CREATE TABLE `Items` (
   FOREIGN KEY (`final_jacket_measurement_id`) REFERENCES `FinalJacketMeasurement`(`measurement_id`),
   FOREIGN KEY (`final_shirt_measurement_id`) REFERENCES `FinalShirtMeasurement`(`measurement_id`),
   FOREIGN KEY (`final_pant_measurement_id`) REFERENCES `FinalPantMeasurement`(`measurement_id`)
+);
+
+CREATE TABLE `Users` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `username` VARCHAR(255) NOT NULL UNIQUE,
+    `password` VARCHAR(255) NOT NULL,
+    `token` VARCHAR(255) DEFAULT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

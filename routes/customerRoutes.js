@@ -1,25 +1,26 @@
 import express from 'express';
 import { getCustomerById, getCustomers, searchCustomers, createCustomer, updateCustomer, mergeCustomers } from '../services/customerService.js';
+import passport from '../passportConfig.js';
 
 const router = express.Router();
 
 //CUSTOMER ROUTES
 
 // Get all customers
-router.get("/customers", async (req, res) => {
+router.get("/customers", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const customers = await getCustomers();
     res.send(customers);
 })
 
 // Get a customer by ID
-router.get("/customer/:id", async (req, res) => {
+router.get("/customer/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const id = req.params.id;
     const customer = await getCustomerById(id);
     res.send(customer);
 })
 
 // Search for customers by name or mobile number
-router.get("/customers/search", async (req, res) => {
+router.get("/customers/search", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { query } = req.query; // Access the search query parameter
     if (!query) {
         return res.status(400).send('Search query is required');
@@ -34,7 +35,7 @@ router.get("/customers/search", async (req, res) => {
 });
 
 // Create a new customer
-router.post("/customer", async (req, res) => {
+router.post("/customer", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { first_name, last_name, mobile, add1, middle_name, add2, add3, add4, email, office_phone, residential_phone, last_ordered_date } = req.body;
     try {
         if (!first_name || !last_name || !mobile) {
@@ -48,7 +49,7 @@ router.post("/customer", async (req, res) => {
 });
 
 // Update an existing customer
-router.put("/customer/:id", async (req, res) => {
+router.put("/customer/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { id } = req.params;
     try {
         const updateResult = await updateCustomer(id, req.body);
@@ -64,7 +65,7 @@ router.put("/customer/:id", async (req, res) => {
 });
 
 // Merge customers
-router.post("/customers/merge", async (req, res) => {
+router.post("/customers/merge", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const { customerIds } = req.body;
     if (!Array.isArray(customerIds) || customerIds.length < 2) {
         return res.status(400).send({ message: 'You must provide an array of at least two customer IDs to merge.' });

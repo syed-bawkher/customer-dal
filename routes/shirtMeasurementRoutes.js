@@ -1,26 +1,27 @@
 import { getShirtMeasurementByCustomerId, getShirtMeasurementByOrderNo, createShirtMeasurement, updateShirtMeasurement } from '../services/shirtMeasurementService.js';
 import express from 'express';
+import passport from '../passportConfig.js';
 
 const router = express.Router();
 
 //SHIRT MEASUREMENT ROUTES
 
 //get shirt measurement by customer id
-router.get("/shirtMeasurement/customer/:id", async (req, res) => {
+router.get("/shirtMeasurement/customer/:id", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const id = req.params.id;
     const shirtMeasurement = await getShirtMeasurementByCustomerId(id);
     res.send(shirtMeasurement);
 })
 
 //get shirt measurement by order number
-router.get("/shirtMeasurement/order/:orderNo", async (req, res) => {
+router.get("/shirtMeasurement/order/:orderNo", passport.authenticate('bearer', { session: false }), async (req, res) => {
     const orderNo = req.params.orderNo;
     const shirtMeasurement = await getShirtMeasurementByOrderNo(orderNo);
     res.send(shirtMeasurement);
 })
 
 //create a new shirt measurement
-router.post("/shirtMeasurement/:customerid/:orderNo", async (req, res) => {
+router.post("/shirtMeasurement/:customerid/:orderNo", passport.authenticate('bearer', { session: false }), async (req, res) => {
     try {
         const { customerid, orderNo } = req.params;
         const data = { ...req.body, customer_id: customerid, orderNo: orderNo };
@@ -33,7 +34,7 @@ router.post("/shirtMeasurement/:customerid/:orderNo", async (req, res) => {
 });
 
 // Update shirt measurement
-router.put("/shirtMeasurement/:measurementId", async (req, res) => {
+router.put("/shirtMeasurement/:measurementId", passport.authenticate('bearer', { session: false }), async (req, res) => {
     try {
         const { measurementId } = req.params;
         const data = req.body;
