@@ -1,6 +1,6 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 
@@ -158,4 +158,32 @@ export async function getOrderPhotos(orderNo, expiresIn = 3600) {
     );
 
     return photoUrls;
+}
+
+// Function to delete a photo
+export async function deletePhoto(orderNo, s3Key) {
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // Delete photo from the database
+        await connection.query("DELETE FROM OrderPhotos WHERE orderNo = ? AND s3_key = ?", [orderNo, s3Key]);
+
+        // Delete photo from S3 bucket
+        const command = new DeleteObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Key: s3Key,
+        });
+
+        await s3Client.send(command);
+
+        await connection.commit();
+        console.log(`Photo ${s3Key} for order ${orderNo} deleted successfully.`);
+    } catch (error) {
+        await connection.rollback();
+        console.error('Failed to delete photo:', error);
+        throw error; 
+    } finally {
+        connection.release();
+    }
 }
