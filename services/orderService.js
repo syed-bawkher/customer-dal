@@ -86,6 +86,9 @@ export async function deleteOrder(orderNo) {
     try {
         await connection.beginTransaction();
 
+        // Delete from OrderPhotos table
+        await connection.query("DELETE FROM OrderPhotos WHERE orderNo = ?", [orderNo]);
+
         // Delete from Items table
         await connection.query("DELETE FROM Items WHERE orderNo = ?", [orderNo]);
 
