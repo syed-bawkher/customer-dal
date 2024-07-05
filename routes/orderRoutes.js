@@ -1,5 +1,5 @@
 import express from "express";
-import { getOrders, getOrderById, getOrdersByCustomerId, createOrder, deleteOrder } from "../services/orderService.js";
+import { getOrders, getOrderById, getOrdersByCustomerId, createOrder, deleteOrder, getOrderPhotoCount, generatePresignedUrl, getOrderPhotos } from "../services/orderService.js";
 import passport from '../passportConfig.js';
 
 const router = express.Router();
@@ -54,6 +54,40 @@ router.delete("/order/:id", passport.authenticate('bearer', { session: false }),
     } catch (error) {
         console.error('Failed to delete order:', error);
         res.status(500).send({ message: 'Failed to delete order', error: error.message });
+    }
+});
+
+// Upload Photo (Get Presigned URL)
+router.post("/order/:orderNo/upload-photo", async (req, res) => {
+    const { orderNo } = req.params;
+    const { filename } = req.body;
+
+    try {
+        const photoCount = await getOrderPhotoCount(orderNo);
+        if (photoCount >= 5) {
+            return res.status(400).send({ message: 'Maximum of 5 photos can be uploaded per order.' });
+        }
+
+        const s3Key = `orders/${orderNo}/${filename}`;
+        const url = await generatePresignedUrl(orderNo, s3Key);
+
+        res.status(200).send({ url });
+    } catch (error) {
+        console.error('Failed to generate presigned URL:', error);
+        res.status(500).send({ message: 'Failed to generate presigned URL', error: error.message });
+    }
+});
+
+router.get("/order/:orderNo/photos", async (req, res) => {
+    const { orderNo } = req.params;
+
+    try {
+        const photoUrls = await getOrderPhotos(orderNo);
+
+        res.status(200).send({ photoUrls });
+    } catch (error) {
+        console.error('Failed to retrieve order photos:', error);
+        res.status(500).send({ message: 'Failed to retrieve order photos', error: error.message });
     }
 });
 

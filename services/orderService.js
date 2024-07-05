@@ -1,5 +1,7 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 
 dotenv.config();  // This should be at the top
@@ -11,6 +13,14 @@ const pool = mysql.createPool({
     password: process.env.SB_DB_PASSWORD,
     database: process.env.SB_DB_DATABASE,
 }).promise();
+
+const s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
+});
 
 // gets all orders
 export async function getOrders() {
@@ -109,4 +119,43 @@ export async function deleteOrder(orderNo) {
     } finally {
         connection.release();
     }
+}
+
+//S3 Photo Upload
+
+export async function generatePresignedUrl(orderNo, key, expiresIn = 3600) {
+    const command = new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: key,
+    });
+
+    const url = await getSignedUrl(s3Client, command, { expiresIn });
+
+    await pool.query("INSERT INTO OrderPhotos (orderNo, s3_key) VALUES (?, ?)", [orderNo, key]);
+
+    return url;
+}
+
+export async function getOrderPhotoCount(orderNo) {
+    const [rows] = await pool.query("SELECT COUNT(*) as count FROM OrderPhotos WHERE orderNo = ?", [orderNo]);
+    return rows[0].count;
+}
+
+// Function to get all photos of an order
+export async function getOrderPhotos(orderNo, expiresIn = 3600) {
+    const [rows] = await pool.query("SELECT s3_key FROM OrderPhotos WHERE orderNo = ?", [orderNo]);
+
+    const photoUrls = await Promise.all(
+        rows.map(async (row) => {
+            const command = new GetObjectCommand({
+                Bucket: process.env.AWS_S3_BUCKET_NAME,
+                Key: row.s3_key,
+            });
+
+            const url = await getSignedUrl(s3Client, command, { expiresIn });
+            return { key: row.s3_key, url };
+        })
+    );
+
+    return photoUrls;
 }
