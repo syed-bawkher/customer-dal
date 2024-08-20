@@ -139,15 +139,17 @@ CREATE TABLE `Items` (
   `final_jacket_measurement_id` VARCHAR(36) NULL,
   `final_shirt_measurement_id` VARCHAR(36) NULL,
   `final_pant_measurement_id` VARCHAR(36) NULL,
-  `fabric_name` VARCHAR(255),
-  `lining_name` VARCHAR(255),
+  `fabric_id` VARCHAR(255),
+  `lining_fabric_id` VARCHAR(255),
   FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`),
   FOREIGN KEY (`jacket_measurement_id`) REFERENCES `JacketMeasurement`(`measurement_id`),
   FOREIGN KEY (`shirt_measurement_id`) REFERENCES `ShirtMeasurement`(`measurement_id`),
   FOREIGN KEY (`pant_measurement_id`) REFERENCES `PantMeasurement`(`measurement_id`),
   FOREIGN KEY (`final_jacket_measurement_id`) REFERENCES `FinalJacketMeasurement`(`measurement_id`),
   FOREIGN KEY (`final_shirt_measurement_id`) REFERENCES `FinalShirtMeasurement`(`measurement_id`),
-  FOREIGN KEY (`final_pant_measurement_id`) REFERENCES `FinalPantMeasurement`(`measurement_id`)
+  FOREIGN KEY (`final_pant_measurement_id`) REFERENCES `FinalPantMeasurement`(`measurement_id`),
+  FOREIGN KEY (`fabric_id`) REFERENCES `Fabric`(`fabric_id`),
+  FOREIGN KEY (`lining_fabric_id`) REFERENCES `Fabric`(`fabric_id`)
 );
 
 CREATE TABLE `Users` (
@@ -165,4 +167,16 @@ CREATE TABLE `OrderPhotos` (
   `s3_key` VARCHAR(255),
   `uploaded_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`orderNo`) REFERENCES `Orders`(`orderNo`)
+);
+
+CREATE TABLE `Fabric` (
+  `fabric_id` VARCHAR(255) PRIMARY KEY,
+  `fabric_code` VARCHAR(255),
+  `fabric_name` VARCHAR(255),
+  `fabric_location` VARCHAR(255),
+  `fabric_length` VARCHAR(255),
+  `fabric_supplier` VARCHAR(255),
+  `fabric_brand` VARCHAR(255),
+  `fabric_purchase_date` DATE,
+  UNIQUE (`fabric_id`)
 );

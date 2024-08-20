@@ -67,7 +67,7 @@ router.get("/item/:id", passport.authenticate('bearer', { session: false }), asy
 
 // Create a new jacket
 router.post("/item/jacket", passport.authenticate('bearer', { session: false }), async (req, res) => {
-    const { orderNo, item_name, jacket_measurement_id, fabric_id, lining_id } = req.body;
+    const { orderNo, item_name, jacket_measurement_id, fabric_id, lining_fabric_id } = req.body;
     try {
         const result = await createJacket(orderNo, item_name, jacket_measurement_id, fabric_id, lining_fabric_id);
         res.status(201).send({ message: 'Jacket created successfully', itemId: result.insertId });

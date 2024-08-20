@@ -1,7 +1,7 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 
-dotenv.config();  // This should be at the top
+dotenv.config();
 
 const pool = mysql.createPool({
     host: process.env.SB_DB_HOST,
@@ -22,32 +22,12 @@ export async function getFabricById(fabricId) {
     return rows[0];
 }
 
-// Function to create a fabric if it doesn't exist
-export async function createFabricIfNotExist(fabricId) {
-    if (!fabricId) return;  // Skip if fabricId is null or undefined
-
-    const fabric = await getFabricById(fabricId);
-    if (!fabric) {
-        const defaultFabric = {
-            fabric_id: fabricId,
-            fabric_code: 'N/A',
-            fabric_name: 'N/A',
-            fabric_location: 'N/A',
-            fabric_length: '0',
-            fabric_supplier: 'N/A',
-            fabric_brand: 'N/A',
-            fabric_purchase_date: null
-        };
-        await createFabric(defaultFabric);
-    }
-}
-
 // Function to create a new fabric
 export async function createFabric(fabric) {
-    const { fabric_id, fabric_code, fabric_name, fabric_location, fabric_length, fabric_supplier, fabric_brand, fabric_purchase_date } = fabric;
-    const sql = "INSERT INTO Fabric (fabric_id, fabric_code, fabric_name, fabric_location, fabric_length, fabric_supplier, fabric_brand, fabric_purchase_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    const { fabric_id, description, available_length, fabric_supplier, fabric_brand, stock_location, image, barcode } = fabric;
+    const sql = "INSERT INTO Fabric (fabric_id, description, available_length, fabric_supplier, fabric_brand, stock_location, image, barcode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     try {
-        const [result] = await pool.query(sql, [fabric_id, fabric_code, fabric_name, fabric_location, fabric_length, fabric_supplier, fabric_brand, fabric_purchase_date]);
+        const [result] = await pool.query(sql, [fabric_id, description, available_length, fabric_supplier, fabric_brand, stock_location, image, barcode]);
         console.log(`Fabric created with ID: ${result.insertId}`);
         return result;
     } catch (error) {
@@ -98,5 +78,25 @@ export async function deleteFabric(fabricId) {
     } catch (error) {
         console.error('Failed to delete fabric:', error);
         throw error;
+    }
+}
+
+// Function to create a fabric if it doesn't exist
+export async function createFabricIfNotExist(fabricId) {
+    if (!fabricId) return;  // Skip if fabricId is null or undefined
+
+    const fabric = await getFabricById(fabricId);
+    if (!fabric) {
+        const defaultFabric = {
+            fabric_id: fabricId,
+            description: 'N/A',
+            available_length: 0,
+            fabric_supplier: 'N/A',
+            fabric_brand: 'N/A',
+            stock_location: 'N/A',
+            image: null,
+            barcode: 'N/A'
+        };
+        await createFabric(defaultFabric);
     }
 }
