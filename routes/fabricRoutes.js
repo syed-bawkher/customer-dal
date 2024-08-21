@@ -4,7 +4,10 @@ import {
     getFabricById,
     createFabric,
     updateFabric,
-    deleteFabric
+    deleteFabric,
+    generateFabricUploadUrl,
+    getFabricImageUrl,
+    deleteFabricImage
 } from '../services/fabricService.js';
 import passport from '../passportConfig.js';
 
@@ -79,6 +82,46 @@ router.delete("/fabric/:id", passport.authenticate('bearer', { session: false })
     } catch (error) {
         console.error('Failed to delete fabric:', error);
         res.status(500).send({ message: 'Failed to delete fabric', error: error.message });
+    }
+});
+
+// Upload Fabric Image (Get Presigned URL)
+router.post("/fabric/:fabricId/upload-image", passport.authenticate('bearer', { session: false }), async (req, res) => {
+    const { fabricId } = req.params;
+    const { filename } = req.body;
+
+    try {
+        const url = await generateFabricUploadUrl(fabricId, filename);
+        res.status(200).send({ url });
+    } catch (error) {
+        console.error('Failed to generate presigned URL for fabric image:', error);
+        res.status(500).send({ message: 'Failed to generate presigned URL', error: error.message });
+    }
+});
+
+// Get Fabric Image URL
+router.get("/fabric/:fabricId/image", passport.authenticate('bearer', { session: false }), async (req, res) => {
+    const { fabricId } = req.params;
+
+    try {
+        const url = await getFabricImageUrl(fabricId);
+        res.status(200).send({ url });
+    } catch (error) {
+        console.error('Failed to retrieve fabric image URL:', error);
+        res.status(500).send({ message: 'Failed to retrieve fabric image URL', error: error.message });
+    }
+});
+
+// Delete Fabric Image
+router.delete("/fabric/:fabricId/image", passport.authenticate('bearer', { session: false }), async (req, res) => {
+    const { fabricId } = req.params;
+
+    try {
+        await deleteFabricImage(fabricId);
+        res.status(200).send({ message: `Image for fabric ${fabricId} deleted successfully.` });
+    } catch (error) {
+        console.error('Failed to delete fabric image:', error);
+        res.status(500).send({ message: 'Failed to delete fabric image', error: error.message });
     }
 });
 

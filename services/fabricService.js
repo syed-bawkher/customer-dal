@@ -1,5 +1,7 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 dotenv.config();
 
@@ -9,6 +11,14 @@ const pool = mysql.createPool({
     password: process.env.SB_DB_PASSWORD,
     database: process.env.SB_DB_DATABASE,
 }).promise();
+
+const s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
+});
 
 // Function to get all fabrics
 export async function getAllFabrics() {
@@ -100,3 +110,71 @@ export async function createFabricIfNotExist(fabricId) {
         await createFabric(defaultFabric);
     }
 }
+
+// Function to generate a presigned URL for uploading fabric image
+export async function generateFabricUploadUrl(fabricId, filename, expiresIn = 3600) {
+    const s3Key = `fabrics/${fabricId}/${filename}`;
+    const command = new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: s3Key,
+    });
+
+    const url = await getSignedUrl(s3Client, command, { expiresIn });
+
+    // Optionally, save the S3 key in the Fabric table or a related table
+    await pool.query("UPDATE Fabric SET image = ? WHERE fabric_id = ?", [s3Key, fabricId]);
+
+    return url;
+}
+
+// Function to retrieve the presigned URL for viewing the fabric image
+export async function getFabricImageUrl(fabricId, expiresIn = 3600) {
+    const [rows] = await pool.query("SELECT image FROM Fabric WHERE fabric_id = ?", [fabricId]);
+
+    if (rows.length === 0 || !rows[0].image) {
+        throw new Error("Image not found for the specified fabric.");
+    }
+
+    const command = new GetObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: rows[0].image,
+    });
+
+    const url = await getSignedUrl(s3Client, command, { expiresIn });
+    return url;
+}
+
+// Function to delete the fabric image
+export async function deleteFabricImage(fabricId) {
+    const connection = await pool.getConnection();
+    try {
+        const [rows] = await connection.query("SELECT image FROM Fabric WHERE fabric_id = ?", [fabricId]);
+
+        if (rows.length === 0 || !rows[0].image) {
+            throw new Error("Image not found for the specified fabric.");
+        }
+
+        const s3Key = rows[0].image;
+        await connection.beginTransaction();
+
+        // Delete image from the S3 bucket
+        const command = new DeleteObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Key: s3Key,
+        });
+        await s3Client.send(command);
+
+        // Optionally, remove the S3 key reference from the Fabric table
+        await connection.query("UPDATE Fabric SET image = NULL WHERE fabric_id = ?", [fabricId]);
+
+        await connection.commit();
+        console.log(`Image ${s3Key} for fabric ${fabricId} deleted successfully.`);
+    } catch (error) {
+        await connection.rollback();
+        console.error('Failed to delete fabric image:', error);
+        throw error;
+    } finally {
+        connection.release();
+    }
+}
+
