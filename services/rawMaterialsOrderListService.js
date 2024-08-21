@@ -24,10 +24,10 @@ export async function getRawMaterialsOrderById(orderId) {
 
 // Function to create a new raw materials order
 export async function createRawMaterialsOrder(order) {
-    const { product_name, description, raw_material_code, color, supplier_name, quantity, ordered_date } = order;
-    const sql = "INSERT INTO RawMaterialsOrderList (product_name, description, raw_material_code, color, supplier_name, quantity, ordered_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const { product_name, description, raw_material_code, color, supplier_name, supplier_id, quantity, ordered_date } = order;
+    const sql = "INSERT INTO RawMaterialsOrderList (product_name, description, raw_material_code, color, supplier_name, supplier_id, quantity, ordered_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     try {
-        const [result] = await pool.query(sql, [product_name, description, raw_material_code, color, supplier_name, quantity, ordered_date]);
+        const [result] = await pool.query(sql, [product_name, description, raw_material_code, color, supplier_name, supplier_id, quantity, ordered_date]);
         console.log(`Raw materials order created with ID: ${result.insertId}`);
         return result;
     } catch (error) {
