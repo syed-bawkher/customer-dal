@@ -2,9 +2,7 @@ import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import { createFabricIfNotExist } from './fabricService.js';
 
-
-dotenv.config();  // This should be at the top
-
+dotenv.config();
 
 const pool = mysql.createPool({
     host: process.env.SB_DB_HOST,
@@ -12,8 +10,6 @@ const pool = mysql.createPool({
     password: process.env.SB_DB_PASSWORD,
     database: process.env.SB_DB_DATABASE,
 }).promise();
-
-
 
 export async function getAllItems() {
     const [rows] = await pool.query("SELECT * FROM Items");

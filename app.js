@@ -7,6 +7,9 @@ import shirtMeasurementRoutes from './routes/shirtMeasurementRoutes.js';
 import pantMeasurementRoutes from './routes/pantMeasurementRoutes.js';
 import itemsRoutes from './routes/itemsRoutes.js';
 import fabricRoutes from './routes/fabricRoutes.js';
+import fabricOrderListRoutes from './routes/fabricOrderListRoutes.js';
+import rawMaterialsOrderListRoutes from './routes/rawMaterialsOrderListRoutes.js';
+import supplierRoutes from './routes/supplierRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
 const app = express();
@@ -28,6 +31,9 @@ app.use(shirtMeasurementRoutes);
 app.use(pantMeasurementRoutes);
 app.use(itemsRoutes);
 app.use(fabricRoutes);
+app.use(fabricOrderListRoutes);
+app.use(rawMaterialsOrderListRoutes);
+app.use(supplierRoutes);
 app.use(authRoutes);
 
 
