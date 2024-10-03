@@ -77,19 +77,56 @@ export async function updateFabric(fabricId, fields) {
     }
 }
 
-// Function to delete a fabric
+
+// Function to delete a fabric and all related fabric orders
 export async function deleteFabric(fabricId) {
+    const connection = await pool.getConnection();
     try {
-        const [result] = await pool.query("DELETE FROM Fabric WHERE fabric_id = ?", [fabricId]);
+        // Start a transaction to ensure atomicity
+        await connection.beginTransaction();
+
+        // Retrieve all related fabric orders
+        const [fabricOrders] = await connection.query("SELECT * FROM FabricOrderList WHERE fabric_code = ?", [fabricId]);
+
+        if (fabricOrders.length > 0) {
+            // Delete all related fabric orders from FabricOrderList
+            await connection.query("DELETE FROM FabricOrderList WHERE fabric_code = ?", [fabricId]);
+            console.log(`Deleted ${fabricOrders.length} fabric orders related to fabric ID ${fabricId}`);
+        }
+
+        // Delete the fabric image from S3 (if exists)
+        const [fabricRows] = await connection.query("SELECT image FROM Fabric WHERE fabric_id = ?", [fabricId]);
+        if (fabricRows.length > 0 && fabricRows[0].image) {
+            const s3Key = fabricRows[0].image;
+            const command = new DeleteObjectCommand({
+                Bucket: process.env.AWS_S3_BUCKET_NAME,
+                Key: s3Key,
+            });
+            await s3Client.send(command);
+            console.log(`Image ${s3Key} for fabric ${fabricId} deleted successfully.`);
+        }
+
+        // Finally, delete the fabric from the Fabric table
+        const [result] = await connection.query("DELETE FROM Fabric WHERE fabric_id = ?", [fabricId]);
         if (result.affectedRows === 0) {
             throw new Error('No fabric found with the provided ID.');
         }
+
+        // Commit the transaction if everything succeeded
+        await connection.commit();
+        console.log(`Fabric with ID ${fabricId} and its related fabric orders were deleted successfully.`);
         return result;
     } catch (error) {
-        console.error('Failed to delete fabric:', error);
+        // Roll back the transaction in case of an error
+        await connection.rollback();
+        console.error('Failed to delete fabric and its related orders:', error);
         throw error;
+    } finally {
+        // Release the connection
+        connection.release();
     }
 }
+
 
 // Function to create a fabric if it doesn't exist
 export async function createFabricIfNotExist(fabricId) {
