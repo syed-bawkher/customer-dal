@@ -180,7 +180,11 @@ export async function createFabricIfNotExist(fabricCode) {
             return createResult;  // Return the result of the insert, which should include the insertId
         } else if (rows && rows.length > 0) {
             console.log(`Fabric with fabric code "${fabricCode}" already exists.`);
-            return rows[0];  // Return the existing fabric data
+            const resultItem = {
+                insertId: rows[0].fabric_id,
+            }
+            console.log(resultItem)
+            return resultItem;  // Return the existing fabric data
         }
         return null;  // Return null if the query returned no valid result
     } catch (error) {
