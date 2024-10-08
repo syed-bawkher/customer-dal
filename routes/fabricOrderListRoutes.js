@@ -124,23 +124,23 @@ router.delete(
 
 // Get all fabric orders by fabric code
 router.get(
-  "/fabric-orders/code/:fabricCode",
+  "/fabric-orders/fabricId/:fabricId",
   passport.authenticate("bearer", { session: false }),
   async (req, res) => {
-    const { fabricCode } = req.params;
+    const { fabricId } = req.params;
     try {
-      const orders = await getFabricOrdersByFabricCode(fabricCode);
+      const orders = await getFabricOrdersByFabricCode(fabricId);
       if (orders.length > 0) {
         res.send(orders);
       } else {
         res
           .status(404)
           .send({
-            message: "No fabric orders found for the provided fabric code",
+            message: "No fabric orders found for the provided fabric Id",
           });
       }
     } catch (error) {
-      console.error("Error getting fabric orders by fabric code:", error);
+      console.error("Error getting fabric orders by fabric Id:", error);
       res.status(500).send("Error retrieving fabric orders: " + error.message);
     }
   }

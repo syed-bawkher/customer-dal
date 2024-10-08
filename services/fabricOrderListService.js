@@ -24,10 +24,10 @@ export async function getFabricOrderById(orderId) {
 
 // Function to create a new fabric order
 export async function createFabricOrder(order) {
-    const { fabric_code, description, supplier_name, supplier_id, meters, ordered_date, ordered_for } = order;
-    const sql = "INSERT INTO FabricOrderList (fabric_code, description, supplier_name, supplier_id, meters, ordered_date, ordered_for) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const { fabric_id, description, supplier_name, supplier_id, meters, ordered_date, ordered_for } = order;
+    const sql = "INSERT INTO FabricOrderList (fabric_id, description, supplier_name, supplier_id, meters, ordered_date, ordered_for) VALUES (?, ?, ?, ?, ?, ?, ?)";
     try {
-        const [result] = await pool.query(sql, [fabric_code, description, supplier_name, supplier_id, meters, ordered_date, ordered_for]);
+        const [result] = await pool.query(sql, [fabric_id, description, supplier_name, supplier_id, meters, ordered_date, ordered_for]);
         console.log(`Fabric order created with ID: ${result.insertId}`);
         return result;
     } catch (error) {
@@ -82,12 +82,12 @@ export async function deleteFabricOrder(orderId) {
 }
 
 // Function to get all fabric orders by fabric code
-export async function getFabricOrdersByFabricCode(fabricCode) {
+export async function getFabricOrdersByFabricCode(fabricId) {
     try {
-        const [rows] = await pool.query("SELECT * FROM FabricOrderList WHERE fabric_code = ?", [fabricCode]);
+        const [rows] = await pool.query("SELECT * FROM FabricOrderList WHERE fabric_id = ?", [fabricId]);
         return rows;
     } catch (error) {
-        console.error('Failed to get fabric orders by fabric code:', error);
+        console.error('Failed to get fabric orders by fabric Id:', error);
         throw error;
     }
 }

@@ -7,7 +7,8 @@ import {
     deleteFabric,
     generateFabricUploadUrl,
     getFabricImageUrl,
-    deleteFabricImage
+    deleteFabricImage,
+    searchFabric
 } from '../services/fabricService.js';
 import passport from '../passportConfig.js';
 
@@ -23,6 +24,21 @@ router.get("/fabrics", passport.authenticate('bearer', { session: false }), asyn
     } catch (error) {
         console.error('Error getting fabrics:', error);
         res.status(500).send('Error retrieving fabrics: ' + error.message);
+    }
+});
+
+router.get("/fabrics/search", passport.authenticate('bearer', { session: false }), async (req, res) => {
+    const { query } = req.query; // Search query passed as a query parameter
+    if (!query) {
+        return res.status(400).send({ message: 'Search query is required' });
+    }
+
+    try {
+        const searchResults = await searchFabric(query);
+        res.send(searchResults);
+    } catch (error) {
+        console.error('Error searching fabrics:', error);
+        res.status(500).send('Error searching fabrics: ' + error.message);
     }
 });
 
