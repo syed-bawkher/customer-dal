@@ -34,12 +34,12 @@ export async function getFabricById(fabricId) {
 
 // Function to create a new fabric
 export async function createFabric(fabric) {
-    const { fabric_id, description, available_length, fabric_supplier, fabric_brand, stock_location, image, barcode } = fabric;
-    const sql = "INSERT INTO Fabric (fabric_id, description, available_length, fabric_supplier, fabric_brand, stock_location, image, barcode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    const { description, available_length, fabric_code, fabric_brand, stock_location, image, barcode } = fabric;
+    const sql = "INSERT INTO Fabric (description, available_length, fabric_code, fabric_brand, stock_location, image, barcode) VALUES (?, ?, ?, ?, ?, ?, ?)";
     try {
-        const [result] = await pool.query(sql, [fabric_id, description, available_length, fabric_supplier, fabric_brand, stock_location, image, barcode]);
-        console.log(`Fabric created with ID: ${result.insertId}`);
-        return result;
+        const [result] = await pool.query(sql, [description, available_length, fabric_code, fabric_brand, stock_location, image, barcode]);
+        console.log(`at create fabric Fabric created with ID: ${result.insertId}`);
+        return result; 
     } catch (error) {
         console.error('Failed to create fabric:', error);
         throw error;
@@ -77,7 +77,6 @@ export async function updateFabric(fabricId, fields) {
     }
 }
 
-
 // Function to delete a fabric and all related fabric orders
 export async function deleteFabric(fabricId) {
     const connection = await pool.getConnection();
@@ -86,11 +85,11 @@ export async function deleteFabric(fabricId) {
         await connection.beginTransaction();
 
         // Retrieve all related fabric orders
-        const [fabricOrders] = await connection.query("SELECT * FROM FabricOrderList WHERE fabric_code = ?", [fabricId]);
+        const [fabricOrders] = await connection.query("SELECT * FROM FabricOrderList WHERE fabric_id = ?", [fabricId]);
 
         if (fabricOrders.length > 0) {
             // Delete all related fabric orders from FabricOrderList
-            await connection.query("DELETE FROM FabricOrderList WHERE fabric_code = ?", [fabricId]);
+            await connection.query("DELETE FROM FabricOrderList WHERE fabric_id = ?", [fabricId]);
             console.log(`Deleted ${fabricOrders.length} fabric orders related to fabric ID ${fabricId}`);
         }
 
@@ -127,26 +126,70 @@ export async function deleteFabric(fabricId) {
     }
 }
 
+// Function to search fabric by brand name, fabric code, fabric ID, barcode, or stock location
+export async function searchFabric(searchQuery) {
+    const sql = `
+        SELECT fabric_id, description, available_length, fabric_code, fabric_brand, stock_location, image, barcode 
+        FROM Fabric 
+        WHERE fabric_code LIKE ? 
+        OR fabric_brand LIKE ?
+        OR description LIKE ? 
+        OR fabric_id LIKE ? 
+        OR barcode LIKE ? 
+        OR stock_location LIKE ?
+    `;
+    const searchPattern = `%${searchQuery}%`;  // Using '%' wildcard for flexible matching
 
-// Function to create a fabric if it doesn't exist
-export async function createFabricIfNotExist(fabricId) {
-    if (!fabricId) return;  // Skip if fabricId is null or undefined
-
-    const fabric = await getFabricById(fabricId);
-    if (!fabric) {
-        const defaultFabric = {
-            fabric_id: fabricId,
-            description: 'N/A',
-            available_length: 0,
-            fabric_supplier: 'N/A',
-            fabric_brand: 'N/A',
-            stock_location: 'N/A',
-            image: null,
-            barcode: 'N/A'
-        };
-        await createFabric(defaultFabric);
+    try {
+        const [rows] = await pool.query(sql, [searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern]);
+        return rows;
+    } catch (error) {
+        console.error('Failed to search for fabrics:', error);
+        throw error;
     }
 }
+
+
+// Function to create a fabric if the fabric code does not exist (case-insensitive)
+export async function createFabricIfNotExist(fabricCode) {
+    if (!fabricCode) return null;  // Return null if fabricCode is null or undefined
+
+    try {
+        // Search for an existing fabric with the same fabric_code (case-insensitive)
+        const result = await pool.query("SELECT * FROM Fabric WHERE LOWER(fabric_code) = LOWER(?)", [fabricCode]);
+
+        // Ensure result is iterable and contains rows
+        const rows = Array.isArray(result) ? result[0] : result;
+        
+        if (rows && rows.length === 0) {
+            // If no fabric with the given fabric code exists, create a new one
+            const defaultFabric = {
+                description: 'N/A',
+                available_length: 0,
+                fabric_code: fabricCode,  // Use the provided fabric code
+                fabric_brand: 'N/A',
+                stock_location: 'N/A',
+                image: null,
+                barcode: 'N/A'
+            };
+            console.log(defaultFabric)
+            console.log(`default fabric`)
+            const createResult = await createFabric(defaultFabric);
+            console.log(`New fabric created with fabric code: ${fabricCode} from createFabricIfNotExist function`);
+
+            return createResult;  // Return the result of the insert, which should include the insertId
+        } else if (rows && rows.length > 0) {
+            console.log(`Fabric with fabric code "${fabricCode}" already exists.`);
+            return rows[0];  // Return the existing fabric data
+        }
+        return null;  // Return null if the query returned no valid result
+    } catch (error) {
+        console.error('Failed to check or create fabric by fabric code:', error);
+        throw error;
+    }
+}
+
+
 
 // Function to generate a presigned URL for uploading fabric image
 export async function generateFabricUploadUrl(fabricId, filename, expiresIn = 3600) {
@@ -214,4 +257,3 @@ export async function deleteFabricImage(fabricId) {
         connection.release();
     }
 }
-
