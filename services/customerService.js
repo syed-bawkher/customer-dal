@@ -27,6 +27,22 @@ export async function getCustomerById(id) {
   return row;
 }
 
+export async function getCustomerByOrderNo(orderNo) {
+  const query = `
+        SELECT Customer.* 
+        FROM Customer
+        JOIN Orders ON Customer.customer_id = Orders.customer_id
+        WHERE Orders.orderNo = ?;
+    `;
+  try {
+    const [rows] = await pool.query(query, [orderNo]);
+    return rows[0]; // Return the first row (or undefined if not found)
+  } catch (error) {
+    console.error("Database query failed:", error);
+    throw error; // Rethrow the error to be caught by the caller
+  }
+}
+
 export async function searchCustomers(searchTerm) {
   const searchPattern = `%${searchTerm}%`; // Used for partial matching on name
   const query = `
