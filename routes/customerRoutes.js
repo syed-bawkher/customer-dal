@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCustomerById, getCustomers, searchCustomers, createCustomer, updateCustomer, mergeCustomers } from '../services/customerService.js';
+import { getCustomerById, getCustomers, searchCustomers, createCustomer, updateCustomer, mergeCustomers, getCustomerByOrderNo } from '../services/customerService.js';
 import passport from '../passportConfig.js';
 
 const router = express.Router();
@@ -31,6 +31,22 @@ router.get("/customers/search", passport.authenticate('bearer', { session: false
     } catch (error) {
         console.error('Search error:', error);
         res.status(500).send('Error searching for customers: ' + error.message);
+    }
+});
+
+// Get a customer by order number
+router.get("/customer/order/:orderNo", passport.authenticate('bearer', { session: false }), async (req, res) => {
+    const orderNo = req.params.orderNo;
+    try {
+        const customer = await getCustomerByOrderNo(orderNo);
+        if (customer) {
+            res.send(customer);
+        } else {
+            res.status(404).send({ message: 'Customer not found for order number: ' + orderNo });
+        }
+    } catch (error) {
+        console.error('Error getting customer by order number:', error);
+        res.status(500).send({ message: 'Error getting customer by order number', error: error.message });
     }
 });
 
